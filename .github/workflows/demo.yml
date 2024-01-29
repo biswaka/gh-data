@@ -24,7 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build website
-        run: npm run build
+        run: npm run build # Gives Output folder 'dist', which we can upload to a server (Job artifact)
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with: #Additional config
+          name: dist-files #name of the artifact
+          path: dist # A file, directory or wildcard pattern that describes what to upload
   deploy:
     needs: build
     runs-on: ubuntu-latest
