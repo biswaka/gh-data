@@ -18,6 +18,8 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    outputs:  #to generate and share outputs
+      script-file: ${{ steps.publish.outputs.step-script-file }}   #script-file is variable, TO SET OVERALL OUTPUT FOR A JOB; steps is context
     steps:
       - name: Get code
         uses: actions/checkout@v4
@@ -25,6 +27,18 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build # Gives Output folder 'dist', which we can upload to a server (Job artifact)
+      - name: Publish JS Filename
+        id: publish #to access data of this step with steps context and id
+        run: find dist/assets/*.js -type f -execdir echo 'step-script-file={}' >> $GITHUB_OUTPUT ';' #step-script-file->step output name
+        # $GITHUB_OUTPUT: it targets a file, a special file created by GitHub in the environment in which your job runs 
+        #                 where the output key-value pair is written to.
+
+        # 'step-script-file={}' >> $GITHUB_OUTPUT: So this overall command simply writes the output to a file, 
+        # a file which path is stored in this special variable, which is provided by GitHub Actions.
+
+        # find dist/assets/*.js -type f -execdir echo '{}' ';' #Linux Command that outputs the filename, 
+        # but we need to make this available to other jobs, to do so we create an output
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with: #Additional config
@@ -40,5 +54,7 @@ jobs:
           name: dist-files #grabs the .zip file and downloads and unzips it here, Note: we lose the dist folder and the files in dist folder are available in this job
       - name: Output Contents
         run: ls #lists all the contents of the folder we currently are in, we'll see we have all the dist files in the folder in which deploy job runs
+      - name: Output Filename
+        run: echo "${{ needs.build.outputs.script-file }}"
       - name: Deploy
         run: echo "Deploying..."
