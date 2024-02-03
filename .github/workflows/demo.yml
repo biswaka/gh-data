@@ -53,7 +53,7 @@ jobs:
       - name: Get Build Artifacts
         uses: actions/download-artifact@v4 #download artifact uploaded by previous job
         with:
-          name: dist-files #grabs the .zip file and downloads and unzips it here, Note: we lose the dist folder and the files in dist folder are available in this job
+          name: dist-files-1 #grabs the .zip file and downloads and unzips it here, Note: we lose the dist folder and the files in dist folder are available in this job
       - name: Output Contents
         run: ls #lists all the contents of the folder we currently are in, we'll see we have all the dist files in the folder in which deploy job runs
       - name: Output Filename
